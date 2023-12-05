@@ -1,6 +1,7 @@
 from pf import *
 from ekf import *
 import numpy as np
+import pybullet as p
 from utils import get_collision_fn_PR2, load_env, execute_trajectory, draw_sphere_marker
 from pybullet_tools.utils import connect, disconnect, wait_for_user,get_joint_positions, wait_if_gui, set_joint_positions, joint_from_name, get_link_pose, link_from_name
 from pybullet_tools.pr2_utils import PR2_GROUPS
@@ -24,7 +25,6 @@ def main(screenshot=False):
     wait_for_user()
 
     start_config = tuple(get_joint_positions(robots['pr2'], base_joints))
-
 
     wait_if_gui()
     disconnect()
