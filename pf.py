@@ -2,44 +2,72 @@ import numpy as np
 import numpy.linalg as la
 import matplotlib.pyplot as plt
 
-T_MAX = 1000
-SENSOR_COV = 0.05 * np.eye(3)
-NUM_PARTICLES = 1000
-X_MAX = 8
-Y_MAX = 4
-
-
-class Particle():
-    def __init__(self) -> None:
-        self.x = 0.0
-        self.y = 0.0
-        self.z = 0.0
-        self.w = 0.0
-        
-    
+T_MAX = 1000 # iteration for particle filter & len of interpolated path
+SENSOR_STD = [0.05, 0.05, 0.05] #[x, y, theta]
+ACTION_STD = [0.05, 0.05, 0.05] #[x, y, theta]
+NUM_PARTICLES = 1000 # number of particles for particle filter
+X_MAX = 8 # max x length for map
+Y_MAX = 4 # max y length for map
     
 class ParticleFilter():
-    def __init__(self, num_particles) -> None:
-        self.particles = []
+    def __init__(self, num_particles, x_max, y_max) -> None:
         self.num_particles = num_particles
-        self.random_init()
+        self.particles_t0 = []
+        self.particles_tminus1 = []
+        self.random_init(x_max, y_max)
+        self.particles_t = []
+        self.samples_t = []
+        self.weight_t = []
+        self.u_t = []
+        self.z_t = []
 
-    def random_init(self):
-        self.particles = np.random.rand(3, self.num_particles)
-        self.particles[0] = (self.particles[0] * 2 - 1) * X_MAX
-        self.particles[1] = (self.particles[1] * 2 - 1) * Y_MAX
-        self.particles[2] = (self.particles[2] * 2 - 1) * np.pi
-        self.particles = self.particles.T
+    def random_init(self, x_max, y_max):
+        self.particles_t0 = np.random.rand(3, self.num_particles)
+        self.particles_t0[0] = (self.particles_t0[0] * 2 - 1) * x_max
+        self.particles_t0[1] = (self.particles_t0[1] * 2 - 1) * y_max
+        self.particles_t0[2] = (self.particles_t0[2] * 2 - 1) * np.pi
+        self.particles_t0 = self.particles_t0.T
+        self.particles_tminus1 = self.particles_t0
 
-
-    def action_model(self):
-        pass
+    def action_model(self, action_std):
+        '''
+        Sample x_t_m ~ p(x_t | u_t, x_tminus1)
+        Update self.particle_t
+        '''
+        mean = self.u_t
+        # cov = np.eye(3)
+        # cov[0, 0] = np.sqrt(action_std[0] * mean[0])
+        # cov[1, 1] = np.sqrt(action_std[1] * mean[1])
+        # cov[2, 2] = np.sqrt(action_std[2] * mean[2])
+        # actual_dxytheta = np.random.multivariate_normal(mean, cov)
+        cov_x = np.sqrt(action_std[0] * mean[0])
+        cov_y = np.sqrt(action_std[1] * mean[1])
+        cov_theta = np.sqrt(action_std[2] * mean[2])
+        
+        actual_dx = np.random.normal(mean[0], cov_x)
+        actual_dy = np.random.normal(mean[1], cov_y)
+        actual_dtheta = np.random.normal(mean[2], cov_theta)
+        actual_dxytheta = np.array([actual_dx, actual_dy, actual_dtheta])
+        
+        particles_t = self.particles_tminus1 + actual_dxytheta
+        particles_t.T[2] = warp_to_pi(particles_t.T[2])
+        self.particles_t = particles_t
     
     def sensor_model(self):
-        pass
+        '''
+        w_t_m = p(z_t | x_t_m)
+        S_t = S_t U (x_t_m, w_t_m)
+        Update self.weight_t and self.sample_t
+        '''
+        
+        
     
     def low_var_resample(self):
-        pass
+        '''
+        Update self.particle_tminus1
+        '''
+        
+        
     
 def get_action(path: np.ndarray, t) -> np.ndarray:
     '''
@@ -53,7 +81,7 @@ def get_action(path: np.ndarray, t) -> np.ndarray:
     return path[t] - path[t - 1]
 
 
-def get_sensor(path: np.ndarray, t) -> np.ndarray:
+def get_sensor(path: np.ndarray, t, sensor_std) -> np.ndarray: # maybe can randomly generate a config within the map and plugin
     '''
     Input: 
     path: path given, shape:(M, 3)
@@ -63,13 +91,21 @@ def get_sensor(path: np.ndarray, t) -> np.ndarray:
     z_t: sensor reading
     '''
     true_config = path[t]
-    noisey_config = np.random.multivariate_normal(true_config, SENSOR_COV)
+    sensor_cov = np.eye(3)
+    sensor_cov[0,0] = sensor_std[0]
+    sensor_cov[1,1] = sensor_std[1]
+    sensor_cov[2,2] = sensor_std[2]
+    
+    noisey_config = np.random.multivariate_normal(true_config, sensor_cov)
     return noisey_config
 
-    
+def warp_to_pi(angles):
+    angles = np.mod(angles, 2 * np.pi)
+    angles[angles > np.pi] -= 2 * np.pi
+    return angles
     
 def main():
-    # read path
+    ################ read path ################
     path = []
     line_temp = []
     with open('path_maze.txt', 'r') as file:
@@ -92,26 +128,47 @@ def main():
         path_temp.append(np.interp(x_after_interpolate, x_before_interpolate, np.squeeze(item)))
     path = np.array(path_temp).T
 
-    # particle filter
+    ################ particle filter ################
     t = 0
     u_cache = []
     z_cache = []
-    pf = ParticleFilter(NUM_PARTICLES)
+    pf = ParticleFilter(NUM_PARTICLES, X_MAX, Y_MAX)
+    
     while(t < T_MAX - 1):  
         t += 1
-        u_t = get_action(path, t)
-        u_cache.append(u_t)
-        z_t = get_sensor(path, t)
-        z_cache.append(z_t)
+        
+        # get control input and sensor data
+        pf.u_t = get_action(path, t)
+        u_cache.append(pf.u_t)
+        pf.z_t = get_sensor(path, t, SENSOR_STD)
+        z_cache.append(pf.z_t)
+        
+        # reset parameter
+        pf.samples_t = []
+        pf.particles_t = []
+        
+        # apply action model
+        pf.action_model(ACTION_STD)
+        
+        # apply sensor model
+        pf.sensor_model()
+        
+        # apply resampling
+        pf.low_var_resample()
+            
+            
 
 
-    # plotting
+    ################ plotting ################
     plt.figure(1)
     plt.scatter(path.T[0], path.T[1], s=5)
     plt.scatter(np.array(z_cache).T[0], np.array(z_cache).T[1], s=5)
 
     plt.figure(2)
-    plt.scatter(pf.particles.T[0], pf.particles.T[1], s=5)
+    plt.scatter(pf.particles_t0.T[0], pf.particles_t0.T[1], s=5)
+    
+    plt.figure(3)
+    plt.scatter(pf.particles_t.T[0], pf.particles_t.T[1], s=5)
 
     plt.show()
 
