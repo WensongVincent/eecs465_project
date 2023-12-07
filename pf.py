@@ -1,6 +1,8 @@
 import numpy as np
 import numpy.linalg as la
 import matplotlib.pyplot as plt
+import scipy.stats as scistats
+import copy
 
 T_MAX = 1000 # iteration for particle filter & len of interpolated path
 SENSOR_STD = [0.05, 0.05, 0.05] #[x, y, theta]
@@ -53,12 +55,28 @@ class ParticleFilter():
         particles_t.T[2] = warp_to_pi(particles_t.T[2])
         self.particles_t = particles_t
     
-    def sensor_model(self):
+    def sensor_model(self, sensor_std):
         '''
         w_t_m = p(z_t | x_t_m)
         S_t = S_t U (x_t_m, w_t_m)
         Update self.weight_t and self.sample_t
         '''
+        w_sum = 0
+        self.weight_t = []
+        
+        sensor_cov = np.eye(3)
+        sensor_cov[0,0] = sensor_std[0]
+        sensor_cov[1,1] = sensor_std[1]
+        sensor_cov[2,2] = sensor_std[2]
+        p = scistats.multivariate_normal(self.z_t, sensor_cov)
+        self.weight_t = np.array(self.weight_t)
+        for particle in self.particles_t:
+            w_t_m = p.pdf(list(particle))
+            self.weight_t = np.append(self.weight_t, w_t_m)
+            w_sum += w_t_m
+        self.weight_t /= w_sum
+        # print(self.weight_t.reshape(-1, 1).shape)
+        self.samples_t = np.concatenate((self.particles_t, self.weight_t.reshape(-1, 1)), axis=1)
         
         
     
@@ -136,6 +154,7 @@ def main():
     
     while(t < T_MAX - 1):  
         t += 1
+        print(f"Num of iteration: {t}")
         
         # get control input and sensor data
         pf.u_t = get_action(path, t)
@@ -151,11 +170,11 @@ def main():
         pf.action_model(ACTION_STD)
         
         # apply sensor model
-        pf.sensor_model()
+        pf.sensor_model(SENSOR_STD)
         
         # apply resampling
         pf.low_var_resample()
-            
+        
             
 
 
