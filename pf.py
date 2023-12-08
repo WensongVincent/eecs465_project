@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import scipy.stats as scistats
 import copy
 
-T_MAX = 1000 # iteration for particle filter & len of interpolated path
-SENSOR_STD = [0.05, 0.05, 0.05] #[x, y, theta]
-ACTION_STD = [0.05, 0.05, 0.05] #[x, y, theta]
+T_MAX = 100 # iteration for particle filter & len of interpolated path
+SENSOR_STD = [0.1, 0.1, 0.1] #[x, y, theta]
+ACTION_STD = [0.5, 0.5, 0.5] #[x, y, theta]
 NUM_PARTICLES = 1000 # number of particles for particle filter
 X_MAX = 8 # max x length for map
 Y_MAX = 4 # max y length for map
@@ -18,7 +18,7 @@ class ParticleFilter():
         self.particles_tminus1 = []
         self.random_init(x_max, y_max)
         self.particles_t = []
-        self.samples_t = []
+        self.samples_t = [] #[[x, y, theta, w],...]
         self.weight_t = []
         self.u_t = []
         self.z_t = []
@@ -42,9 +42,9 @@ class ParticleFilter():
         # cov[1, 1] = np.sqrt(action_std[1] * mean[1])
         # cov[2, 2] = np.sqrt(action_std[2] * mean[2])
         # actual_dxytheta = np.random.multivariate_normal(mean, cov)
-        cov_x = np.sqrt(action_std[0] * mean[0])
-        cov_y = np.sqrt(action_std[1] * mean[1])
-        cov_theta = np.sqrt(action_std[2] * mean[2])
+        cov_x = np.sqrt(action_std[0] * np.abs(mean[0]))
+        cov_y = np.sqrt(action_std[1] * np.abs(mean[1]))
+        cov_theta = np.sqrt(action_std[2] * np.abs(mean[2]))
         
         actual_dx = np.random.normal(mean[0], cov_x)
         actual_dy = np.random.normal(mean[1], cov_y)
@@ -84,6 +84,18 @@ class ParticleFilter():
         '''
         Update self.particle_tminus1
         '''
+        self.particles_tminus1 = np.zeros((self.num_particles, 3))
+        r = np.random.uniform(0, 1.0 / self.num_particles)
+        c = self.samples_t[0, 3]
+        i = 0
+        for m in range(self.num_particles):
+            U = r + m * (1 / self.num_particles)
+            while U > c:
+                i += 1
+                c += self.samples_t[i, 3]
+            self.particles_tminus1[m] = self.samples_t[i, :3]
+            
+        
         
         
     
@@ -96,7 +108,11 @@ def get_action(path: np.ndarray, t) -> np.ndarray:
     Output: 
     u_t: action the robot make for next step (configuration difference)
     '''
-    return path[t] - path[t - 1]
+    moved = False
+    u_t = path[t] - path[t - 1]
+    if la.norm(u_t) > 1e-10:
+        moved = True
+    return u_t, moved
 
 
 def get_sensor(path: np.ndarray, t, sensor_std) -> np.ndarray: # maybe can randomly generate a config within the map and plugin
@@ -108,6 +124,7 @@ def get_sensor(path: np.ndarray, t, sensor_std) -> np.ndarray: # maybe can rando
     Output: 
     z_t: sensor reading
     '''
+    measured = True # set to always true for now since always taking sensor measurement
     true_config = path[t]
     sensor_cov = np.eye(3)
     sensor_cov[0,0] = sensor_std[0]
@@ -115,7 +132,7 @@ def get_sensor(path: np.ndarray, t, sensor_std) -> np.ndarray: # maybe can rando
     sensor_cov[2,2] = sensor_std[2]
     
     noisey_config = np.random.multivariate_normal(true_config, sensor_cov)
-    return noisey_config
+    return noisey_config, measured
 
 def warp_to_pi(angles):
     angles = np.mod(angles, 2 * np.pi)
@@ -150,32 +167,41 @@ def main():
     t = 0
     u_cache = []
     z_cache = []
+    particles_cache = []
     pf = ParticleFilter(NUM_PARTICLES, X_MAX, Y_MAX)
+    moved = False
+    measured = False
     
     while(t < T_MAX - 1):  
         t += 1
         print(f"Num of iteration: {t}")
         
         # get control input and sensor data
-        pf.u_t = get_action(path, t)
+        pf.u_t, moved = get_action(path, t)
         u_cache.append(pf.u_t)
-        pf.z_t = get_sensor(path, t, SENSOR_STD)
+        # if not moved:
+        #     print(f"Not moved at step {t}")
+        pf.z_t, measured = get_sensor(path, t, SENSOR_STD)
         z_cache.append(pf.z_t)
         
-        # reset parameter
-        pf.samples_t = []
-        pf.particles_t = []
-        
-        # apply action model
-        pf.action_model(ACTION_STD)
-        
-        # apply sensor model
-        pf.sensor_model(SENSOR_STD)
-        
-        # apply resampling
-        pf.low_var_resample()
-        
+        if moved and measured:
+            # reset parameter
+            pf.samples_t = []
+            pf.particles_t = []
             
+            # apply action model
+            pf.action_model(ACTION_STD)
+            
+            # apply sensor model
+            pf.sensor_model(SENSOR_STD)
+            
+            # apply resampling
+            pf.low_var_resample()
+            
+            if t%10 == 0:
+                particles_cache.append(pf.particles_t)
+        
+     
 
 
     ################ plotting ################
@@ -187,7 +213,13 @@ def main():
     plt.scatter(pf.particles_t0.T[0], pf.particles_t0.T[1], s=5)
     
     plt.figure(3)
-    plt.scatter(pf.particles_t.T[0], pf.particles_t.T[1], s=5)
+    plt.scatter(particles_cache[0].T[0], particles_cache[0].T[1], s=5)
+    
+    plt.figure(4)
+    plt.scatter(particles_cache[1].T[0], particles_cache[1].T[1], s=5)
+    
+    plt.figure(5)
+    plt.scatter(particles_cache[2].T[0], particles_cache[2].T[1], s=5)
 
     plt.show()
 
