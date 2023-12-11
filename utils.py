@@ -38,7 +38,6 @@ def draw_sphere_marker(position, radius, color):
    marker_id = p.createMultiBody(basePosition=position, baseCollisionShapeIndex=-1, baseVisualShapeIndex=vs_id)
    return marker_id
 
-
 def draw_line(start, end, width, color):
     line_id = p.addUserDebugLine(start, end, color, width)
     return line_id
