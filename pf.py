@@ -78,8 +78,6 @@ class ParticleFilter():
         # print(self.weight_t.reshape(-1, 1).shape)
         self.samples_t = np.concatenate((self.particles_t, self.weight_t.reshape(-1, 1)), axis=1)
         
-        
-    
     def low_var_resample(self):
         '''
         Update self.particle_tminus1
@@ -94,10 +92,6 @@ class ParticleFilter():
                 i += 1
                 c += self.samples_t[i, 3]
             self.particles_tminus1[m] = self.samples_t[i, :3]
-            
-        
-        
-        
     
 def get_action(path: np.ndarray, t) -> np.ndarray:
     '''
@@ -113,7 +107,6 @@ def get_action(path: np.ndarray, t) -> np.ndarray:
     if la.norm(u_t) > 1e-10:
         moved = True
     return u_t, moved
-
 
 def get_sensor(path: np.ndarray, t, sensor_std) -> np.ndarray: # maybe can randomly generate a config within the map and plugin
     '''
@@ -154,7 +147,7 @@ def main():
             else:
                 line_temp.append(line)
     path = np.array(path)
-
+    
     # interpolate path
     x_before_interpolate = np.linspace(0, path.shape[1] - 1, path.shape[1])
     x_after_interpolate = np.linspace(0, path.shape[1], T_MAX)
@@ -162,7 +155,9 @@ def main():
     for item in path:
         path_temp.append(np.interp(x_after_interpolate, x_before_interpolate, np.squeeze(item)))
     path = np.array(path_temp).T
-
+    print(path.shape)
+    
+    
     ################ particle filter ################
     t = 0
     u_cache = []
@@ -200,9 +195,6 @@ def main():
             
             if t%10 == 0:
                 particles_cache.append(pf.particles_t)
-        
-     
-
 
     ################ plotting ################
     plt.figure(1)
@@ -222,7 +214,6 @@ def main():
     plt.scatter(particles_cache[2].T[0], particles_cache[2].T[1], s=5)
 
     plt.show()
-
 
 
 if __name__ == '__main__':

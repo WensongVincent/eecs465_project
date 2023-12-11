@@ -3,13 +3,12 @@ import numpy.linalg as la
 import matplotlib.pyplot as plt
 
 class ExtendedKalmanFilter:
-    def __init__(self, initial_state, initial_covariance, motion_noise, sensor_noise, landmarks):
+    def __init__(self, initial_state, initial_covariance, motion_noise, sensor_noise):
         self.state = initial_state
         self.covariance = initial_covariance
         self.motion_noise = motion_noise
         self.sensor_noise = sensor_noise
-        self.landmarks = landmarks
-
+        
     def predict(self, control_input, dt):
         v_l, v_r = control_input
         x, y, theta = self.state
@@ -63,35 +62,49 @@ class ExtendedKalmanFilter:
     def get_state(self):
         return self.state
 
-def read_path_from_file(file_path):
-    """ 从文件中读取路径数据 """
+# Read data from file
+def read_path_from_file(file_path, T_MAX):
+    path = []
+    line_temp = []
     with open(file_path, 'r') as file:
-        lines = file.readlines()
-        path = [list(map(float, line.split())) for line in lines]
+        for line in file:
+            if ']' in line:
+                line_temp.append(line)
+                joint_line = ''.join(line_temp).replace('[', ' ').replace(']', ' ').replace('\n', ' ').split(' ')
+                joint_line = np.array([float(num) for num in joint_line if num != ''])
+                path.append(joint_line)
+                line_temp = []
+            else:
+                line_temp.append(line)
+
     return np.array(path)
 
+# Simulate lidar measurements 
+def simulate_lidar_measurements():
+    
+
 def main():
-    # EKF初始化
-    initial_state = np.array([0, 0, 0])  # 初始状态：x, y, θ
-    initial_covariance = np.eye(3)  # 初始协方差矩阵
-    motion_noise = 0.1  # 运动噪声
-    sensor_noise = np.array([[0.5, 0], [0, 0.1]])  # 传感器噪声
-    landmarks = [(2, 1), (3, 2)]  # 地标位置
-
-    ekf = ExtendedKalmanFilter(initial_state, initial_covariance, motion_noise, sensor_noise, landmarks)
-
-    # 从文件中读取路径
+    ################ read path from recorded data ################
     path = read_path_from_file('path_maze.txt')
-    x_path, y_path, theta_path = path
+    x_path, y_path, theta_path = path[:,0], path[:,1], path[:,2]
 
+    ################ Extend Kalman Filter ################
+    # EKF initialization
+    initial_state = path[0,:]  # x0: x, y, θ
+    initial_covariance = np.eye(3)  # p0: initial covarience
+    motion_noise = np.array([[0.5, 0, 0], [0, 0.5, 0], [0, 0, 0.5]])  # random motion noise for test
+    sensor_noise = np.array([[0.1, 0, 0], [0, 0.1, 0], [0, 0, 0.1]])  # random sensor noise for test
+    
+    ekf = ExtendedKalmanFilter(initial_state, initial_covariance, motion_noise, sensor_noise)
+
+    # loop through all the path to estimate the state of the pr2 robot
     # 用于存储EKF状态的列表
     ekf_states = []
-
     # 遍历路径
-    for i in range(1, len(x_path)):
+    for i in range(1, path.shape[1]):
         # 假设控制输入是基于位置差的
         control_input = [x_path[i] - x_path[i-1], y_path[i] - y_path[i-1]]
-        ekf.predict(control_input, dt=1.0)  # 预测步骤
+        ekf.predict(control_input, dt = 1.0)  # 预测步骤
 
         # 模拟从激光雷达得到的测量数据
         # 此处为了简化，我们使用真实位置加上一些随机噪声
@@ -101,11 +114,12 @@ def main():
 
         ekf_states.append(ekf.get_state())
 
-    # 可视化结果
     ekf_states = np.array(ekf_states)
-    plt.figure()
-    plt.plot(x_path, y_path, label="Actual Path")
-    plt.plot(ekf_states[:, 0], ekf_states[:, 1], label="EKF Path")
+    
+    # visualization
+    plt.figure(1)
+    plt.plot(x_path, y_path, label = "Actual Path")
+    plt.scatter(ekf_states[:, 0], ekf_states[:, 1], label = "EKF Path")
     plt.legend()
     plt.show()
 
