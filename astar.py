@@ -332,7 +332,9 @@ def main(screenshot=False):
     # initialize PyBullet
     connect(use_gui=True)
     # load robot and obstacle resources
-    robots, obstacles = load_env('pr2maze.json')
+    # robots, obstacles = load_env('pr2maze.json')
+    robots, obstacles = load_env('pr2empty.json')
+    # robots, obstacles = load_env('pr2complexMaze.json')
 
     # define active DoFs
     base_joints = [joint_from_name(robots['pr2'], name) for name in PR2_GROUPS['base']]
@@ -358,7 +360,9 @@ def main(screenshot=False):
 
     # store the path for localization
     path = path.T
-    with open('path_maze.txt', 'w') as file:
+    # with open('path_maze.txt', 'w') as file:
+    with open('path_empty.txt', 'w') as file:
+    # with open('path_complexMaze.txt', 'w') as file:
         for item in path:
             file.write(f'{item}\n')
     path = list(path.T)

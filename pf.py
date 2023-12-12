@@ -40,11 +40,6 @@ class ParticleFilter():
         Update self.particle_t
         '''
         mean = self.u_t
-        # cov = np.eye(3)
-        # cov[0, 0] = np.sqrt(action_std[0] * mean[0])
-        # cov[1, 1] = np.sqrt(action_std[1] * mean[1])
-        # cov[2, 2] = np.sqrt(action_std[2] * mean[2])
-        # actual_dxytheta = np.random.multivariate_normal(mean, cov)
         cov_x = np.sqrt(action_std[0] * np.abs(mean[0]))
         cov_y = np.sqrt(action_std[1] * np.abs(mean[1]))
         cov_theta = np.sqrt(action_std[2] * np.abs(mean[2]))

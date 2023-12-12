@@ -15,9 +15,9 @@ def main(screenshot=False):
     # load robot and obstacle resources
     
     ############### Change map here ###############
-    robots, obstacles = load_env('pr2maze.json')
+    # robots, obstacles = load_env('pr2maze.json')
     # robots, obstacles = load_env('pr2empty.json')
-    # obots, obstacles = load_env('pr2complexMaze.json')
+    robots, obstacles = load_env('pr2complexMaze.json')
 
     # define active DoFs
     base_joints = [joint_from_name(robots['pr2'], name) for name in PR2_GROUPS['base']]
