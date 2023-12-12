@@ -3,9 +3,9 @@ import numpy.linalg as la
 import matplotlib.pyplot as plt
 
 class KalmanFilter:
-    def __init__(self, A, B, C, R, Q, initial_state, initial_covariance):
+    def __init__(self, A, B_func, C, R, Q, initial_state, initial_covariance):
         self.A = A
-        self.B = B
+        self.B_func = B_func
         self.C = C
         self.R = R
         self.Q = Q
@@ -13,6 +13,8 @@ class KalmanFilter:
         self.covariance = initial_covariance
  
     def predict(self, control_input):
+        theta = self.state[2]
+        self.B = self.B_func(theta)
         self.state = np.dot(self.A, self.state) + np.dot(self.B, control_input)
         self.covariance = np.dot(np.dot(self.A, self.covariance), self.A.T) + self.Q
 
@@ -42,27 +44,32 @@ def read_path_from_file(file_path):
     return np.array(path) 
 
 # -- Simulate a location sensor with Guassian noise
-def location_sensor_measurements(true_state, sensor_noise):
+def location_sensor_measurements(true_state, sensor_noise_covariance):
     measured_positions = np.zeros_like(true_state)
     for i in range(true_state.shape[1]):
         x_true, y_true, theta_true = true_state[:, i]
-
-        # Generate noise for x, y, and theta separately
-        x_noise = np.random.normal(0, sensor_noise[0,0])
-        y_noise = np.random.normal(0, sensor_noise[1,1])
-        theta_noise = np.random.normal(0, sensor_noise[2,2])
-
-        # Calculate measured values ​​with errors
-        measured_positions[0, i] = x_true + x_noise
-        measured_positions[1, i] = y_true + y_noise
-        measured_positions[2, i] = theta_true + theta_noise
+        
+        # Generate noise from multivariate normal distribution
+        noise = np.random.multivariate_normal([0, 0, 0], sensor_noise_covariance)
+        measured_positions[:, i] = [x_true, y_true, theta_true] + noise
     return measured_positions
+
+# -- Calculate error in rmse
+def calculate_rmse(estimated_states, true_states):
+    if estimated_states.shape != true_states.shape:
+        raise ValueError("The shapes of the estimated and true states must be the same.")
+    
+    squared_errors = (estimated_states - true_states) ** 2
+    mean_squared_errors = squared_errors.mean(axis=0)
+    rmse = np.sqrt(mean_squared_errors)
+    return rmse
 
 def main():
     # Read path from recorded data 
     true_state = read_path_from_file('path_maze.txt')
     x_true, y_true, theta_true = true_state
 
+    ################ Kalman Filter ################
     # KF initialization
     from pr2_models import A, B, C, R, Q
     initial_state = true_state[:,0]  # x_0: x, y, θ
@@ -75,6 +82,8 @@ def main():
 
     # Estimate the state of a pr2 robot
     kf_states = []
+    kf_states.append(initial_state)
+    
     for i in range(1, true_state.shape[1]):
         # control input
         dx = x_true[i] - x_true[i-1]
@@ -92,7 +101,11 @@ def main():
 
     kf_states = np.array(kf_states)
     
-    # Visualization
+    # Calculate error
+    rmse = calculate_rmse(kf_states, true_state.T)
+    print("KF RMSE: ", rmse)
+
+    ################ Visualization ################
     # Set the figure size
     plt.figure(figsize=(10, 7))
 
