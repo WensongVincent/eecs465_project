@@ -156,7 +156,7 @@ def main():
     ################ read path ################
     path = []
     line_temp = []
-    with open('path_maze.txt', 'r') as file:
+    with open('path_empty.txt', 'r') as file:
         for line in file:
             if ']' in line:
                 line_temp.append(line)

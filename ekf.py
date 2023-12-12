@@ -33,7 +33,7 @@ class ExtendKalmanFilter:
 
 def main():
     # Read path from recorded data 
-    true_state = read_path_from_file('path_maze.txt')
+    true_state = read_path_from_file('path_empty.txt')
     x_true, y_true, theta_true = true_state
 
     ################ Extend Kalman Filter ################
@@ -72,8 +72,8 @@ def main():
 
     # Plotting the actual, measured, and KF paths
     plt.plot(x_true, y_true, 'b-', label="Actual Path", linewidth=2) 
-    plt.plot(ekf_states[:, 0], ekf_states[:, 1], 'g--', label="EKF Path", linewidth=2)  
-    plt.scatter(x_measured, y_measured, color='r', s=30, label="Sensor Data", alpha=0.5)  
+    plt.plot(ekf_states[:, 0], ekf_states[:, 1], 'r--', label="EKF Path", linewidth=2)  
+    plt.scatter(x_measured, y_measured, color='g', s=30, label="Sensor Data", alpha=0.5)  
 
     # Add arrows to show orientation at selected points
     arrow_skip = 8  # Number of points to skip between arrows
@@ -82,17 +82,17 @@ def main():
                   0.1 * np.cos(theta_true[i]), 0.1 * np.sin(theta_true[i]), 
                   head_width=0.05, head_length=0.1, fc='blue', ec='blue')
         
-    # Add arrows to show orientation for KF path
+    # Add arrows to show orientation for EKF path
     for i in range(0, ekf_states.shape[0], arrow_skip):
         plt.arrow(ekf_states[i, 0], ekf_states[i, 1], 
                   0.1 * np.cos(ekf_states[i, 2]), 0.1 * np.sin(ekf_states[i, 2]), 
-                  head_width=0.05, head_length=0.1, fc='green', ec='green')
+                  head_width=0.05, head_length=0.1, fc='red', ec='red')
 
     # Marking start and end points for each path
     plt.scatter(x_true[0], y_true[0], color='b', marker='o', s=100, label="Start (Actual)", edgecolor='black')
     plt.scatter(x_true[-1], y_true[-1], color='b', marker='X', s=100, label="End (Actual)", edgecolor='black')
-    plt.scatter(ekf_states[0, 0], ekf_states[0, 1], color='g', marker='o', s=100, label="Start (EKF)", edgecolor='black')
-    plt.scatter(ekf_states[-1, 0], ekf_states[-1, 1], color='g', marker='X', s=100, label="End (EKF)", edgecolor='black')
+    plt.scatter(ekf_states[0, 0], ekf_states[0, 1], color='r', marker='o', s=100, label="Start (EKF)", edgecolor='black')
+    plt.scatter(ekf_states[-1, 0], ekf_states[-1, 1], color='r', marker='X', s=100, label="End (EKF)", edgecolor='black')
 
     # Adding labels, title, grid, and legend
     plt.xlabel("X Position") 

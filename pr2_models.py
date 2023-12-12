@@ -22,8 +22,8 @@ def G(state, control_input):
     return G
 
 # R matrix - motion noise covarience matrix (small covarience between x, y and theta)
-R = np.array([[0.5, 0.01, 0.01], [0.01, 0.5, 0.01], [0.01, 0.01, 0.5]])
+R = np.array([[0.05, 0, 0], [0, 0.05, 0], [0, 0, 0.05]])
 
 # Q matrix - sensor noise covarience matrix (2D lidar sensor + IMU)
-Q = np.array([[0.05, 0.001, 0], [0.001, 0.05, 0], [0, 0, 0.05]])
+Q = np.array([[0.03, 0, 0], [0, 0.03, 0], [0, 0, 0.03]])
 

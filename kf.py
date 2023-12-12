@@ -66,7 +66,7 @@ def calculate_rmse(estimated_states, true_states):
 
 def main():
     # Read path from recorded data 
-    true_state = read_path_from_file('path_maze.txt')
+    true_state = read_path_from_file('path_empty.txt')
     x_true, y_true, theta_true = true_state
 
     ################ Kalman Filter ################
@@ -111,11 +111,11 @@ def main():
 
     # Plotting the actual, measured, and KF paths
     plt.plot(x_true, y_true, 'b-', label="Actual Path", linewidth=2) 
-    plt.plot(kf_states[:, 0], kf_states[:, 1], 'g--', label="KF Path", linewidth=2)  
-    plt.scatter(x_measured, y_measured, color='r', s=30, label="Sensor Data", alpha=0.5)  
+    plt.plot(kf_states[:, 0], kf_states[:, 1], 'r--', label="EKF Path", linewidth=2)  
+    plt.scatter(x_measured, y_measured, color='g', s=30, label="Sensor Data", alpha=0.5)  
 
     # Add arrows to show orientation at selected points
-    arrow_skip = 10  # Number of points to skip between arrows
+    arrow_skip = 8  # Number of points to skip between arrows
     for i in range(0, len(theta_true), arrow_skip):
         plt.arrow(x_true[i], y_true[i], 
                   0.1 * np.cos(theta_true[i]), 0.1 * np.sin(theta_true[i]), 
@@ -125,13 +125,13 @@ def main():
     for i in range(0, kf_states.shape[0], arrow_skip):
         plt.arrow(kf_states[i, 0], kf_states[i, 1], 
                   0.1 * np.cos(kf_states[i, 2]), 0.1 * np.sin(kf_states[i, 2]), 
-                  head_width=0.05, head_length=0.1, fc='green', ec='green')
+                  head_width=0.05, head_length=0.1, fc='red', ec='red')
 
     # Marking start and end points for each path
     plt.scatter(x_true[0], y_true[0], color='b', marker='o', s=100, label="Start (Actual)", edgecolor='black')
     plt.scatter(x_true[-1], y_true[-1], color='b', marker='X', s=100, label="End (Actual)", edgecolor='black')
-    plt.scatter(kf_states[0, 0], kf_states[0, 1], color='g', marker='o', s=100, label="Start (KF)", edgecolor='black')
-    plt.scatter(kf_states[-1, 0], kf_states[-1, 1], color='g', marker='X', s=100, label="End (KF)", edgecolor='black')
+    plt.scatter(kf_states[0, 0], kf_states[0, 1], color='r', marker='o', s=100, label="Start (EKF)", edgecolor='black')
+    plt.scatter(kf_states[-1, 0], kf_states[-1, 1], color='r', marker='X', s=100, label="End (EKF)", edgecolor='black')
 
     # Adding labels, title, grid, and legend
     plt.xlabel("X Position") 
