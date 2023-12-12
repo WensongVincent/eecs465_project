@@ -244,7 +244,7 @@ def main():
     plt.figure(2)
     plt.plot(path.T[0], path.T[1], label='Desired Path', c='b')
     plt.scatter(np.array(z_cache).T[0], np.array(z_cache).T[1], s=5, label='Sensor Measurement', c='g')
-    plt.scatter(np.array(particles_cache).T[0], np.array(particles_cache).T[1], s=5 ,label='Estimated Path', c='r')
+    plt.scatter(np.array(particles_cache).T[0], np.array(particles_cache).T[1], s=5 ,label='Particles example', c='r')
     plt.legend()
     plt.xlabel('x')
     plt.ylabel('y')
