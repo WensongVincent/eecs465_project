@@ -107,7 +107,7 @@ def main():
         kf_states.append(kf.get_state())
 
     kf_states = np.array(kf_states)
-    
+
     # Calculate error
     rmse = calculate_rmse(kf_states, true_state.T)
     print("KF RMSE: ", rmse)
@@ -119,7 +119,7 @@ def main():
     plt.ylim(-2,2)
 
     # Plotting the actual, measured, and KF paths
-    plt.plot(x_true, y_true, 'b-', label="Ground Path", linewidth=2) 
+    plt.plot(x_true, y_true, 'b-', label="Ground Truth", linewidth=2) 
     plt.scatter(x_measured, y_measured, color='g', s=30, label="Sensor Data", alpha=0.5)  
     # plt.plot(kf_states[:, 0], kf_states[:, 1], 'r--', label="KF estimation", linewidth=2)  
     plt.scatter(kf_states[:, 0], kf_states[:, 1], color='r', s=30, label="KF estimation", alpha=0.5) 

@@ -69,12 +69,12 @@ def main():
 
     ################ Visualization ################
     # Set the figure size
-    plt.figure(figsize=(8.5, 6))
+    plt.figure(figsize=(8, 6))
     plt.xlim(-4,4)
     plt.ylim(-2,2)
 
     # Plotting the actual, measured, and KF paths
-    plt.plot(x_true, y_true, 'b-', label="Ground truth", linewidth=2) 
+    plt.plot(x_true, y_true, 'b-', label="Ground Truth", linewidth=2) 
     plt.scatter(x_measured, y_measured, color='g', s=30, label="Sensor Data", alpha=0.5)  
     # plt.plot(ekf_states[:, 0], ekf_states[:, 1], 'r--', label="EKF estimation", linewidth=2)  
     plt.scatter(ekf_states[:, 0], ekf_states[:, 1], color='r', s=30, label="EKF estimation", alpha=0.5) 
