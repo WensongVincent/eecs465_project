@@ -124,6 +124,8 @@ def main_kf(path_kf, map_kf):
     plt.legend() 
     plt.grid(True) 
     plt.show()
+
+    disconnect()
     
 
 if __name__ == '__main__':
