@@ -1,61 +1,44 @@
 from pf import *
 from kf import *
+from pr2_models import *
+from utils_filter import *
 import numpy as np
 import pybullet as p
 from utils import get_collision_fn_PR2, load_env, execute_trajectory, draw_sphere_marker
 from pybullet_tools.utils import connect, disconnect, wait_for_user,get_joint_positions, wait_if_gui, set_joint_positions, joint_from_name, get_link_pose, link_from_name
 from pybullet_tools.pr2_utils import PR2_GROUPS
 import time
-
+import copy
+from tqdm import tqdm
 
 def main(screenshot=False):
+    map_list = ["pr2empty.json", "pr2maze.json" , "pr2complexMaze.json"]
+    path_list = ["path_empty.txt", "path_maze.txt", "path_complexMaze.txt"]
 
-     # initialize PyBullet
-    connect(use_gui=True)
-    # load robot and obstacle resources
-    
-    ############### Change map here ###############
-    # robots, obstacles = load_env('pr2maze.json')
-    # robots, obstacles = load_env('pr2empty.json')
-    robots, obstacles = load_env('pr2complexMaze.json')
-
-    # define active DoFs
-    base_joints = [joint_from_name(robots['pr2'], name) for name in PR2_GROUPS['base']]
-
-    collision_fn = get_collision_fn_PR2(robots['pr2'], base_joints, list(obstacles.values()))
-
-    wait_for_user()
-    print(f"==================\nDemo running...\nSome notes comes here\n==================")
+    print(f"==================\nDemo running...\nThere are 3 maps: pr2empty, pr2maze, pr2complexMaze\n==================")
     wait_for_user()
 
-    start_config = tuple(get_joint_positions(robots['pr2'], base_joints))
+    for map_name, path_name in zip(map_list, path_list):
 
-    # read path
-    path = []
-    line_temp = []
-    with open('path_maze.txt', 'r') as file:
-        for line in file:
-            if ']' in line:
-                line_temp.append(line)
-                joint_line = ''.join(line_temp).replace('[', ' ').replace(']', ' ').replace('\n', ' ').split(' ')
-                joint_line = np.array([float(num) for num in joint_line if num is not ''])
-                path.append(joint_line)
-                line_temp = []
-            else:
-                line_temp.append(line)
-    path = np.array(path)
+        print(f"==================\nRunning Demo with Map: {map_name}...")
+        # show path
+        connect(use_gui=True)
+        robots, obstacles = load_env(map_name)
+        base_joints = [joint_from_name(robots['pr2'], name) for name in PR2_GROUPS['base']]
+        path_gui = read_path_from_file_no_interpolate(path_name)
+        for pos in path_gui.T:
+            draw(pos,'black', radius=0.07)
+        execute_trajectory(robots['pr2'], base_joints, path_gui.T, sleep=0.01)
+        wait_if_gui()
+        disconnect()
 
-    # interpolate path
-    x_before_interpolate = np.linspace(0, path.shape[1] - 1, path.shape[1])
-    x_after_interpolate = np.linspace(0, path.shape[1], 1000)
-    path_temp = []
-    for item in path:
-        path_temp.append(np.interp(x_after_interpolate, x_before_interpolate, np.squeeze(item)))
-    path = np.array(path_temp).T
+        # run kf and pf
+        print(f"Running Kalman Filter...")
+        main_kf(path_name, map_name)
+        print(f"Running Particle Filter...")
+        main_pf(path_name, map_name)
+        print(f"Demo with Map: {map_name} Finished!\n==================")
 
-
-    # execute path
-    execute_trajectory(robots['pr2'], base_joints, path, sleep=0.001)
 
     wait_if_gui()
     disconnect()

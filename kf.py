@@ -1,6 +1,7 @@
 import numpy as np
 import numpy.linalg as la
 import matplotlib.pyplot as plt
+from utils_filter import *
 
 class KalmanFilter:
     def __init__(self, A, B_func, C, R, Q, initial_state, initial_covariance):
@@ -27,54 +28,23 @@ class KalmanFilter:
     def get_state(self):
         return self.state
 
-# -- Read data from file
-def read_path_from_file(file_path):
-    path = []
-    line_temp = []
-    with open(file_path, 'r') as file:
-        for line in file:
-            if ']' in line:
-                line_temp.append(line)
-                joint_line = ''.join(line_temp).replace('[', ' ').replace(']', ' ').replace('\n', ' ').split(' ')
-                joint_line = np.array([float(num) for num in joint_line if num != ''])
-                path.append(joint_line)
-                line_temp = []
-            else:
-                line_temp.append(line)
-    path = np.array(path)
 
-    x_before_interpolate = np.linspace(0, path.shape[1] - 1, path.shape[1])
-    x_after_interpolate = np.linspace(0, path.shape[1], 200) # extend data point into 300
-    path_temp = []
-    for item in path:
-        path_temp.append(np.interp(x_after_interpolate, x_before_interpolate, np.squeeze(item)))
 
-    return np.array(path_temp) 
-
-# -- Simulate a location sensor with Guassian noise
-def location_sensor_measurements(true_state, sensor_noise_covariance):
-    measured_positions = np.zeros_like(true_state)
-    for i in range(true_state.shape[1]):
-        x_true, y_true, theta_true = true_state[:, i]
-        
-        # Generate noise from multivariate normal distribution
-        noise = np.random.multivariate_normal([0, 0, 0], sensor_noise_covariance)
-        measured_positions[:, i] = [x_true, y_true, theta_true] + noise
-    return measured_positions
-
-# -- Calculate error in rmse
-def calculate_rmse(estimated_states, true_states):
-    if estimated_states.shape != true_states.shape:
-        raise ValueError("The shapes of the estimated and true states must be the same.")
+def main_kf(path_kf, map_kf):
+    # initialize PyBullet
+    connect(use_gui=True)
+    # load robot and obstacle resources
     
-    squared_errors = (estimated_states - true_states) ** 2
-    mean_squared_errors = squared_errors.mean(axis=0)
-    rmse = np.sqrt(mean_squared_errors)
-    return rmse
+    ############### Change map here ###############
+    robots, obstacles = load_env(map_kf)
 
-def main():
+    # define active DoFs
+    base_joints = [joint_from_name(robots['pr2'], name) for name in PR2_GROUPS['base']]
+
+    collision_fn = get_collision_fn_PR2(robots['pr2'], base_joints, list(obstacles.values()))
+
     # Read path from recorded data 
-    true_state = read_path_from_file('path_empty.txt')
+    true_state = read_path_from_file(path_kf)
     x_true, y_true, theta_true = true_state
 
     ################ Kalman Filter ################
@@ -111,6 +81,10 @@ def main():
     # Calculate error
     rmse = calculate_rmse(kf_states, true_state.T)
     print("KF RMSE: ", rmse)
+
+    # Check collision
+    collision, collision_count = check_collision_in_path(kf_states, robots, base_joints, obstacles)
+    print(f"Collision count: {collision_count}")
 
     ################ Visualization ################
     # Set the figure size
@@ -150,6 +124,7 @@ def main():
     plt.legend() 
     plt.grid(True) 
     plt.show()
+    
 
 if __name__ == '__main__':
-    main()
+    main_kf("path_maze.txt", "pr2maze.json")

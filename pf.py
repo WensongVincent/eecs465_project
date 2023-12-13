@@ -3,11 +3,13 @@ import numpy.linalg as la
 import matplotlib.pyplot as plt
 import scipy.stats as scistats
 import copy
+from tqdm import tqdm
 
 from utils import get_collision_fn_PR2, load_env, execute_trajectory, draw_sphere_marker
 from pybullet_tools.utils import connect, disconnect, wait_for_user,get_joint_positions, wait_if_gui, set_joint_positions, joint_from_name, get_link_pose, link_from_name
 from pybullet_tools.pr2_utils import PR2_GROUPS
 from pr2_models import *
+from utils_filter import *
 
 T_MAX = 300 # iteration for particle filter & len of interpolated path
 ACTION_COV = R #np.array([[0.05, 0, 0], [0, 0.05, 0], [0, 0, 0.05]]) #[0.05, 0.05, 0.05] #[x, y, theta]
@@ -131,7 +133,6 @@ class ParticleFilter():
         self.samples_t[:, 3] /= self.samples_t[:, 3].sum()
         self.particles_tminus1 = copy.deepcopy(self.samples_t[:,:3])
         self.weight_tminus1 = copy.deepcopy(self.samples_t[:,3])
-        
     
     def estimate_config(self):
         x = (self.samples_t[:, 0] * self.samples_t[:, 3]).sum()
@@ -141,51 +142,15 @@ class ParticleFilter():
         theta = np.arctan2(theta_sin, theta_cos)
         
         self.estimated_path.append(np.array([x, y, theta]))
-        
+
     
-def get_action(path: np.ndarray, t) -> np.ndarray:
-    '''
-    Input: 
-    path: path given, shape:(M, 3)
-    t: current time step
-
-    Output: 
-    u_t: action the robot make for next step (configuration difference)
-    '''
-    moved = False
-    u_t = path[t] - path[t - 1]
-    if la.norm(u_t) > 1e-10:
-        moved = True
-    return u_t, moved
-
-def get_sensor(path: np.ndarray, t, sensor_cov) -> np.ndarray: # maybe can randomly generate a config within the map and plugin
-    '''
-    Input: 
-    path: path given, shape:(M, 3)
-    t: current time step
-
-    Output: 
-    z_t: sensor reading
-    '''
-    measured = True # set to always true for now since always taking sensor measurement
-    true_config = path[t]
-    cov = sensor_cov
-    
-    noisey_config = np.random.multivariate_normal(true_config, cov)
-    return noisey_config, measured
-
-def warp_to_pi(angles):
-    angles = np.mod(angles, 2 * np.pi)
-    angles[angles > np.pi] -= 2 * np.pi
-    return angles
-    
-def main():
+def main_pf(path_pf, map_pf):
     # initialize PyBullet
     connect(use_gui=True)
     # load robot and obstacle resources
     
     ############### Change map here ###############
-    robots, obstacles = load_env(MAP)
+    robots, obstacles = load_env(map_pf)
 
     # define active DoFs
     base_joints = [joint_from_name(robots['pr2'], name) for name in PR2_GROUPS['base']]
@@ -196,7 +161,7 @@ def main():
     ################ read path ################
     path = []
     line_temp = []
-    with open(PATH, 'r') as file:
+    with open(path_pf, 'r') as file:
         for line in file:
             if ']' in line:
                 line_temp.append(line)
@@ -226,7 +191,8 @@ def main():
     moved = False
     measured = False
     
-    while(t < T_MAX - 1):  
+    # while(t < T_MAX - 1):
+    for t in tqdm(range(T_MAX-1)):
         t += 1
         
         # get control input and sensor data
@@ -254,7 +220,12 @@ def main():
             
             if t == 0 or t%(T_MAX/10) == 0 or t == T_MAX-1:
                 particles_cache.append(pf.particles_t)
-                print(f"Num of iteration: {t}/{T_MAX}")
+                # print(f"Num of iteration: {t}/{T_MAX}")
+
+    # calculate rmse
+    # rmse = calculate_rmse(np.array(pf.estimated_path), path)
+    collision, collision_count = check_collision_in_path(path, robots, base_joints, obstacles)
+    print(f"Collision count: {collision_count}")
 
     ################ plotting ################
     plt.figure(1, figsize=(8, 6))
@@ -295,15 +266,17 @@ def main():
     plt.grid(True)
     plt.title('Particle Filter Particle Examples')
 
-    plt.figure(3, figsize=(8, 6))
-    plt.xlim(-4,4)
-    plt.ylim(-2,2)
-    plt.scatter(pf.particles_t0.T[0], pf.particles_t0.T[1], s=5, c='r')
+    # plt.figure(3, figsize=(8, 6))
+    # plt.xlim(-4,4)
+    # plt.ylim(-2,2)
+    # plt.scatter(pf.particles_t0.T[0], pf.particles_t0.T[1], s=5, c='r')
 
     plt.show()
 
+    disconnect()
+
 
 if __name__ == '__main__':
-    main()
+    main_pf(PATH, MAP)
     
     
