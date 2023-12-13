@@ -41,7 +41,15 @@ def read_path_from_file(file_path):
                 line_temp = []
             else:
                 line_temp.append(line)
-    return np.array(path) 
+    path = np.array(path)
+
+    x_before_interpolate = np.linspace(0, path.shape[1] - 1, path.shape[1])
+    x_after_interpolate = np.linspace(0, path.shape[1], 200) # extend data point into 300
+    path_temp = []
+    for item in path:
+        path_temp.append(np.interp(x_after_interpolate, x_before_interpolate, np.squeeze(item)))
+
+    return np.array(path_temp) 
 
 # -- Simulate a location sensor with Guassian noise
 def location_sensor_measurements(true_state, sensor_noise_covariance):
@@ -96,7 +104,6 @@ def main():
 
         # correction step
         kf.update(measured_state[:, i])  
-
         kf_states.append(kf.get_state())
 
     kf_states = np.array(kf_states)
@@ -107,15 +114,18 @@ def main():
 
     ################ Visualization ################
     # Set the figure size
-    plt.figure(figsize=(10, 7))
+    plt.figure(figsize=(8.5, 6))
+    plt.xlim(-4,4)
+    plt.ylim(-2,2)
 
     # Plotting the actual, measured, and KF paths
-    plt.plot(x_true, y_true, 'b-', label="Actual Path", linewidth=2) 
-    plt.plot(kf_states[:, 0], kf_states[:, 1], 'r--', label="EKF Path", linewidth=2)  
+    plt.plot(x_true, y_true, 'b-', label="Ground Path", linewidth=2) 
     plt.scatter(x_measured, y_measured, color='g', s=30, label="Sensor Data", alpha=0.5)  
+    # plt.plot(kf_states[:, 0], kf_states[:, 1], 'r--', label="KF estimation", linewidth=2)  
+    plt.scatter(kf_states[:, 0], kf_states[:, 1], color='r', s=30, label="KF estimation", alpha=0.5) 
 
     # Add arrows to show orientation at selected points
-    arrow_skip = 8  # Number of points to skip between arrows
+    arrow_skip = 10 # Number of points to skip between arrows
     for i in range(0, len(theta_true), arrow_skip):
         plt.arrow(x_true[i], y_true[i], 
                   0.1 * np.cos(theta_true[i]), 0.1 * np.sin(theta_true[i]), 
@@ -125,7 +135,7 @@ def main():
     for i in range(0, kf_states.shape[0], arrow_skip):
         plt.arrow(kf_states[i, 0], kf_states[i, 1], 
                   0.1 * np.cos(kf_states[i, 2]), 0.1 * np.sin(kf_states[i, 2]), 
-                  head_width=0.05, head_length=0.1, fc='red', ec='red')
+                  head_width=0.05, head_length=0.1, fc='purple', ec='purple')
 
     # Marking start and end points for each path
     plt.scatter(x_true[0], y_true[0], color='b', marker='o', s=100, label="Start (Actual)", edgecolor='black')

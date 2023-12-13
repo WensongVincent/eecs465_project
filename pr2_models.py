@@ -9,6 +9,10 @@ def B(theta):
     B = np.array([[np.cos(theta), -np.sin(theta), 0], [np.sin(theta), np.cos(theta), 0], [0, 0, 1]])
     return B
 
+def B2(theta):
+    B = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+    return B
+
 # C matrix - observation matrix
 C = np.eye(3)
 
@@ -25,5 +29,5 @@ def G(state, control_input):
 R = np.array([[0.05, 0, 0], [0, 0.05, 0], [0, 0, 0.05]])
 
 # Q matrix - sensor noise covarience matrix (2D lidar sensor + IMU)
-Q = np.array([[0.03, 0, 0], [0, 0.03, 0], [0, 0, 0.03]])
+Q = np.array([[0.02, 0.001, 0], [0.001, 0.02, 0], [0, 0, 0.02]])
 

@@ -33,7 +33,7 @@ class ExtendKalmanFilter:
 
 def main():
     # Read path from recorded data 
-    true_state = read_path_from_file('path_empty.txt')
+    true_state = read_path_from_file('path_maze.txt')
     x_true, y_true, theta_true = true_state
 
     ################ Extend Kalman Filter ################
@@ -66,17 +66,22 @@ def main():
     # Calculate error
     rmse = calculate_rmse(ekf_states, true_state.T)
     print("EKF RMSE: ", rmse)
+
     ################ Visualization ################
     # Set the figure size
-    plt.figure(figsize=(10, 7))
+    plt.figure(figsize=(8.5, 6))
+    plt.xlim(-4,4)
+    plt.ylim(-2,2)
 
     # Plotting the actual, measured, and KF paths
-    plt.plot(x_true, y_true, 'b-', label="Actual Path", linewidth=2) 
-    plt.plot(ekf_states[:, 0], ekf_states[:, 1], 'r--', label="EKF Path", linewidth=2)  
+    plt.plot(x_true, y_true, 'b-', label="Ground truth", linewidth=2) 
     plt.scatter(x_measured, y_measured, color='g', s=30, label="Sensor Data", alpha=0.5)  
+    # plt.plot(ekf_states[:, 0], ekf_states[:, 1], 'r--', label="EKF estimation", linewidth=2)  
+    plt.scatter(ekf_states[:, 0], ekf_states[:, 1], color='r', s=30, label="EKF estimation", alpha=0.5) 
+    
 
     # Add arrows to show orientation at selected points
-    arrow_skip = 8  # Number of points to skip between arrows
+    arrow_skip = 10 # Number of points to skip between arrows
     for i in range(0, len(theta_true), arrow_skip):
         plt.arrow(x_true[i], y_true[i], 
                   0.1 * np.cos(theta_true[i]), 0.1 * np.sin(theta_true[i]), 
@@ -86,7 +91,7 @@ def main():
     for i in range(0, ekf_states.shape[0], arrow_skip):
         plt.arrow(ekf_states[i, 0], ekf_states[i, 1], 
                   0.1 * np.cos(ekf_states[i, 2]), 0.1 * np.sin(ekf_states[i, 2]), 
-                  head_width=0.05, head_length=0.1, fc='red', ec='red')
+                  head_width=0.05, head_length=0.1, fc='purple', ec='purple')
 
     # Marking start and end points for each path
     plt.scatter(x_true[0], y_true[0], color='b', marker='o', s=100, label="Start (Actual)", edgecolor='black')
