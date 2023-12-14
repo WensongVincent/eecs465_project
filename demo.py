@@ -34,15 +34,24 @@ def main(screenshot=False):
         disconnect()
 
         # run kf and pf
-        print(f"Running Kalman Filter...")
+        print(f"========\nRunning Kalman Filter...")
         main_kf(path_name, map_name)
-        print(f"Running Particle Filter...")
+        input("Press Enter to continue:")
+        plt.close()
+        
+        print(f"========\nRunning Particle Filter...")
         main_pf(path_name, map_name)
+        input("Press enter to continue:")
+        plt.close()
+        
         print(f"Demo with Map: {map_name} Finished!\n==================")
 
 
     wait_if_gui()
     disconnect()
+    
+    print(f"All Demo Finished!\n==================")
+    
 
 if __name__ == '__main__':
     main()
