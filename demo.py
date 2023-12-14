@@ -44,6 +44,7 @@ def main(screenshot=False):
         main_pf(path_name, map_name)
         input("Press enter to continue:")
         plt.close()
+        plt.close()
         
         print(f"Demo with Map: {map_name} Finished!\n============================")
 
