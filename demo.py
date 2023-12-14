@@ -45,12 +45,12 @@ def main(screenshot=False):
         input("Press enter to continue:")
         plt.close()
         
-        print(f"Demo with Map: {map_name} Finished!\n==================")
+        print(f"Demo with Map: {map_name} Finished!\n============================")
 
 
     wait_if_gui()
     
-    print(f"All Demo Finished!\n==================")
+    print(f"All Demo Finished!\n====================================")
     
 
 if __name__ == '__main__':
