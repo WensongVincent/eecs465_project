@@ -15,7 +15,7 @@ def main(screenshot=False):
     map_list = ["pr2empty.json", "pr2maze.json" , "pr2complexMaze.json"]
     path_list = ["path_empty.txt", "path_maze.txt", "path_complexMaze.txt"]
 
-    print(f"==================\nDemo running...\nThere are 3 maps: pr2empty, pr2maze, pr2complexMaze\n==================")
+    print(f"==================\nDemo running...\nThere are 3 different maps for demo: pr2empty, pr2maze, pr2complexMaze\n==================")
     wait_for_user()
 
     for map_name, path_name in zip(map_list, path_list):
@@ -23,7 +23,7 @@ def main(screenshot=False):
         print(f"==================\nRunning Demo with Map: {map_name}...")
         # show path
         connect(use_gui=True)
-        p.resetDebugVisualizerCamera(cameraDistance = 5, cameraYaw = 50, cameraPitch = -35, cameraTargetPosition = [0, 0, 0])
+        p.resetDebugVisualizerCamera(cameraDistance = 5, cameraYaw = 0, cameraPitch = -60, cameraTargetPosition = [0, 0, 0])
         robots, obstacles = load_env(map_name)
         base_joints = [joint_from_name(robots['pr2'], name) for name in PR2_GROUPS['base']]
         path_gui = read_path_from_file_no_interpolate(path_name)

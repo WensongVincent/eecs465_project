@@ -38,7 +38,10 @@ def main_kf(path_kf, map_kf):
     
     ############### Change map here ###############
     robots, obstacles = load_env(map_kf)
-    p.resetDebugVisualizerCamera(cameraDistance = 5, cameraYaw = 50, cameraPitch = -35, cameraTargetPosition = [0, 0, 0])
+    
+    # change camera view
+    p.resetDebugVisualizerCamera(cameraDistance = 5, cameraYaw = 0, cameraPitch = -60, cameraTargetPosition = [0, 0, 0])
+    
     # define active DoFs
     base_joints = [joint_from_name(robots['pr2'], name) for name in PR2_GROUPS['base']]
 
