@@ -23,6 +23,7 @@ def main(screenshot=False):
         print(f"==================\nRunning Demo with Map: {map_name}...")
         # show path
         connect(use_gui=True)
+        p.resetDebugVisualizerCamera(cameraDistance = 5, cameraYaw = 50, cameraPitch = -35, cameraTargetPosition = [0, 0, 0])
         robots, obstacles = load_env(map_name)
         base_joints = [joint_from_name(robots['pr2'], name) for name in PR2_GROUPS['base']]
         path_gui = read_path_from_file_no_interpolate(path_name)

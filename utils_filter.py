@@ -42,7 +42,7 @@ def read_path_from_file(file_path):
     path = np.array(path)
 
     x_before_interpolate = np.linspace(0, path.shape[1] - 1, path.shape[1])
-    x_after_interpolate = np.linspace(0, path.shape[1], 200) # extend data point into 300
+    x_after_interpolate = np.linspace(0, path.shape[1], 300) # extend data point into 300
     path_temp = []
     for item in path:
         path_temp.append(np.interp(x_after_interpolate, x_before_interpolate, np.squeeze(item)))

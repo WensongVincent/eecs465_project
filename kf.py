@@ -2,6 +2,7 @@ import numpy as np
 import numpy.linalg as la
 import matplotlib.pyplot as plt
 from utils_filter import *
+import pybullet as p
 
 class KalmanFilter:
     def __init__(self, A, B_func, C, R, Q, initial_state, initial_covariance):
@@ -37,7 +38,7 @@ def main_kf(path_kf, map_kf):
     
     ############### Change map here ###############
     robots, obstacles = load_env(map_kf)
-
+    p.resetDebugVisualizerCamera(cameraDistance = 5, cameraYaw = 50, cameraPitch = -35, cameraTargetPosition = [0, 0, 0])
     # define active DoFs
     base_joints = [joint_from_name(robots['pr2'], name) for name in PR2_GROUPS['base']]
 
@@ -94,28 +95,28 @@ def main_kf(path_kf, map_kf):
 
     # Plotting the actual, measured, and KF paths
     plt.plot(x_true, y_true, 'b-', label="Ground Truth", linewidth=2) 
-    plt.scatter(x_measured, y_measured, color='g', s=30, label="Sensor Data", alpha=0.5)  
+    plt.scatter(x_measured, y_measured, color='g', s=5, label="Sensor Data")  
     # plt.plot(kf_states[:, 0], kf_states[:, 1], 'r--', label="KF estimation", linewidth=2)  
-    plt.scatter(kf_states[:, 0], kf_states[:, 1], color='r', s=30, label="KF estimation", alpha=0.5) 
+    plt.scatter(kf_states[:, 0], kf_states[:, 1], color='r', s=5, label="KF estimation") 
 
     # Add arrows to show orientation at selected points
-    arrow_skip = 10 # Number of points to skip between arrows
+    arrow_skip = 30 # Number of points to skip between arrows
     for i in range(0, len(theta_true), arrow_skip):
         plt.arrow(x_true[i], y_true[i], 
-                  0.1 * np.cos(theta_true[i]), 0.1 * np.sin(theta_true[i]), 
-                  head_width=0.05, head_length=0.1, fc='blue', ec='blue')
+                  0.3 * np.cos(theta_true[i]), 0.3 * np.sin(theta_true[i]), 
+                  head_width=0.07, head_length=0.15, fc='blue', ec='blue')
         
     # Add arrows to show orientation for KF path
     for i in range(0, kf_states.shape[0], arrow_skip):
         plt.arrow(kf_states[i, 0], kf_states[i, 1], 
-                  0.1 * np.cos(kf_states[i, 2]), 0.1 * np.sin(kf_states[i, 2]), 
-                  head_width=0.05, head_length=0.1, fc='purple', ec='purple')
+                  0.3 * np.cos(kf_states[i, 2]), 0.3 * np.sin(kf_states[i, 2]), 
+                  head_width=0.07, head_length=0.15, fc='red', ec='black')
 
     # Marking start and end points for each path
-    plt.scatter(x_true[0], y_true[0], color='b', marker='o', s=100, label="Start (Actual)", edgecolor='black')
-    plt.scatter(x_true[-1], y_true[-1], color='b', marker='X', s=100, label="End (Actual)", edgecolor='black')
-    plt.scatter(kf_states[0, 0], kf_states[0, 1], color='r', marker='o', s=100, label="Start (EKF)", edgecolor='black')
-    plt.scatter(kf_states[-1, 0], kf_states[-1, 1], color='r', marker='X', s=100, label="End (EKF)", edgecolor='black')
+    # plt.scatter(x_true[0], y_true[0], color='b', marker='o', s=100, label="Start (Actual)", edgecolor='black')
+    # plt.scatter(x_true[-1], y_true[-1], color='b', marker='X', s=100, label="End (Actual)", edgecolor='black')
+    # plt.scatter(kf_states[0, 0], kf_states[0, 1], color='r', marker='o', s=100, label="Start (EKF)", edgecolor='black')
+    # plt.scatter(kf_states[-1, 0], kf_states[-1, 1], color='r', marker='X', s=100, label="End (EKF)", edgecolor='black')
 
     # Adding labels, title, grid, and legend
     plt.xlabel("X Position") 

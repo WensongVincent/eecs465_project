@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import scipy.stats as scistats
 import copy
 from tqdm import tqdm
+import pybullet as p
 
 from utils import get_collision_fn_PR2, load_env, execute_trajectory, draw_sphere_marker
 from pybullet_tools.utils import connect, disconnect, wait_for_user,get_joint_positions, wait_if_gui, set_joint_positions, joint_from_name, get_link_pose, link_from_name
@@ -151,7 +152,7 @@ def main_pf(path_pf, map_pf):
     
     ############### Change map here ###############
     robots, obstacles = load_env(map_pf)
-
+    p.resetDebugVisualizerCamera(cameraDistance = 5, cameraYaw = 50, cameraPitch = -35, cameraTargetPosition = [0, 0, 0])
     # define active DoFs
     base_joints = [joint_from_name(robots['pr2'], name) for name in PR2_GROUPS['base']]
 
@@ -239,14 +240,14 @@ def main_pf(path_pf, map_pf):
     arrow_skip = T_MAX//10 # Number of points to skip between arrows
     for i in range(0, T_MAX, arrow_skip):   
         plt.arrow(path[i, 0], path[i, 1], 
-                  0.1 * np.cos(path[i, 2]), 0.1 * np.sin(path[i, 2]), 
-                  head_width=0.05, head_length=0.1, fc='blue', ec='blue')
+                  0.3 * np.cos(path[i, 2]), 0.3 * np.sin(path[i, 2]), 
+                  head_width=0.07, head_length=0.15, fc='blue', ec='blue')
         
     # Add arrows to show orientation for KF path
     for i in range(0, T_MAX, arrow_skip):
         plt.arrow(pf.estimated_path[i][0], pf.estimated_path[i][1], 
-                  0.1 * np.cos(pf.estimated_path[i][2]), 0.1 * np.sin(pf.estimated_path[i][2]), 
-                  head_width=0.05, head_length=0.1, fc='purple', ec='purple')
+                  0.3 * np.cos(pf.estimated_path[i][2]), 0.3 * np.sin(pf.estimated_path[i][2]), 
+                  head_width=0.07, head_length=0.15, fc='red', ec='black')
 
     plt.legend()
     plt.xlabel('X Position')

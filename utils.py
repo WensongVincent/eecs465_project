@@ -16,7 +16,7 @@ def load_env(env_file):
 def get_collision_fn_PR2(robot, joints, obstacles):
     # check robot collision with environment
     disabled_collisions = get_disabled_collisions(robot)
-    return get_collision_fn(robot, joints, obstacles=obstacles, attachments=[], \
+    return get_collision_fn(robot, joints, obstacles=obstacles, attachments=[], 
         self_collisions=True, disabled_collisions=disabled_collisions)
 
 def execute_trajectory(robot, joints, path, sleep=None):
