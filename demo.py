@@ -15,7 +15,7 @@ def main(screenshot=False):
     map_list = ["pr2empty.json", "pr2maze.json" , "pr2complexMaze.json"]
     path_list = ["path_empty.txt", "path_maze.txt", "path_complexMaze.txt"]
 
-    print(f"====================================\nDemo running...\nThere are 3 different maps in demo: pr2empty, pr2maze, pr2complexMaze\nNote: Press enter to close Pybullet GUI & Click the close button to close plots\n============================")
+    print(f"====================================\nDemo running...\nThere are 3 different maps in demo: pr2empty, pr2maze, pr2complexMaze\n============================")
     wait_for_user()
 
     for map_name, path_name in zip(map_list, path_list):
@@ -35,15 +35,23 @@ def main(screenshot=False):
         disconnect()
 
         # run kf and pf
-        print(f"Running Kalman Filter...")
+        print(f"========\nRunning Kalman Filter...")
         main_kf(path_name, map_name)
-        print(f"Running Particle Filter...")
+        input("Press Enter to continue:")
+        plt.close()
+        
+        print(f"========\nRunning Particle Filter...")
         main_pf(path_name, map_name)
-        print(f"Demo with Map: {map_name} Finished!\n============================")
-    
-    print(f"All demo finished!\n====================================")
+        input("Press enter to continue:")
+        plt.close()
+        
+        print(f"Demo with Map: {map_name} Finished!\n==================")
+
+
     wait_if_gui()
-    # disconnect()
+    
+    print(f"All Demo Finished!\n==================")
+    
 
 if __name__ == '__main__':
     main()

@@ -280,10 +280,8 @@ def main_pf(path_pf, map_pf):
     # plt.xlim(-4,4)
     # plt.ylim(-2,2)
     # plt.scatter(pf.particles_t0.T[0], pf.particles_t0.T[1], s=5, c='r')
-    print(f"Click the close button to continue")
 
-    plt.show()
-
+    plt.show(block=False) 
     disconnect()
 
 
