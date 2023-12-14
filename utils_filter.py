@@ -70,7 +70,7 @@ def calculate_rmse(estimated_states, true_states):
     rmse = np.sqrt(mean_squared_errors)
     return rmse
 
-def get_action(path: np.ndarray, t) -> np.ndarray:
+def get_action(path: np.ndarray, t, idx_not_moved) -> np.ndarray:
     '''
     Input: 
     path: path given, shape:(M, 3)
@@ -83,6 +83,8 @@ def get_action(path: np.ndarray, t) -> np.ndarray:
     u_t = path[t] - path[t - 1]
     if la.norm(u_t) > 1e-10:
         moved = True
+    else:
+        idx_not_moved.append(t)
     return u_t, moved
 
 def get_sensor(path: np.ndarray, t, sensor_cov) -> np.ndarray: # maybe can randomly generate a config within the map and plugin

@@ -15,12 +15,12 @@ def main(screenshot=False):
     map_list = ["pr2empty.json", "pr2maze.json" , "pr2complexMaze.json"]
     path_list = ["path_empty.txt", "path_maze.txt", "path_complexMaze.txt"]
 
-    print(f"==================\nDemo running...\nThere are 3 different maps for demo: pr2empty, pr2maze, pr2complexMaze\n==================")
+    print(f"====================================\nDemo running...\nThere are 3 different maps in demo: pr2empty, pr2maze, pr2complexMaze\nNote: Press enter to close Pybullet GUI & Click the close button to close plots\n============================")
     wait_for_user()
 
     for map_name, path_name in zip(map_list, path_list):
 
-        print(f"==================\nRunning Demo with Map: {map_name}...")
+        print(f"============================\nRunning Demo with Map: {map_name}...\nShowing path...")
         # show path
         connect(use_gui=True)
         p.resetDebugVisualizerCamera(cameraDistance = 5, cameraYaw = 0, cameraPitch = -60, cameraTargetPosition = [0, 0, 0])
@@ -30,6 +30,7 @@ def main(screenshot=False):
         for pos in path_gui.T:
             draw(pos,'black', radius=0.07)
         execute_trajectory(robots['pr2'], base_joints, path_gui.T, sleep=0.01)
+        print(f"Path shown, please following the guidance:")
         wait_if_gui()
         disconnect()
 
@@ -38,11 +39,11 @@ def main(screenshot=False):
         main_kf(path_name, map_name)
         print(f"Running Particle Filter...")
         main_pf(path_name, map_name)
-        print(f"Demo with Map: {map_name} Finished!\n==================")
-
-
+        print(f"Demo with Map: {map_name} Finished!\n============================")
+    
+    print(f"All demo finished!\n====================================")
     wait_if_gui()
-    disconnect()
+    # disconnect()
 
 if __name__ == '__main__':
     main()

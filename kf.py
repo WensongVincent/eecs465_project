@@ -127,6 +127,7 @@ def main_kf(path_kf, map_kf):
     plt.title("Kalman Filter Path Tracking") 
     plt.legend() 
     plt.grid(True) 
+    print(f"Click the close button to continue")
     plt.show()
 
     disconnect()

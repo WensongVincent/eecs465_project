@@ -191,16 +191,17 @@ def main_pf(path_pf, map_pf):
     u_cache = []
     z_cache = []
     particles_cache = []
+    idx_not_moved = [0]
     pf = ParticleFilter(NUM_PARTICLES, X_MAX, Y_MAX, collision_fn, CHECK_COLLISION)
     moved = False
     measured = False
     
-    # while(t < T_MAX - 1):
-    for t in tqdm(range(T_MAX-1)):
+    # while(t < T_MAX):
+    for t in tqdm(range(T_MAX - 1)):
         t += 1
         
         # get control input and sensor data
-        pf.u_t, moved = get_action(path, t)
+        pf.u_t, moved = get_action(path, t, idx_not_moved)
         u_cache.append(pf.u_t)
         pf.z_t, measured = get_sensor(path, t, SENSOR_COV)
         z_cache.append(pf.z_t)
@@ -222,12 +223,17 @@ def main_pf(path_pf, map_pf):
             # estimate configuration
             pf.estimate_config()
             
-            if t == 0 or t%(T_MAX/10) == 0 or t == T_MAX-1:
-                particles_cache.append(pf.particles_t)
-                # print(f"Num of iteration: {t}/{T_MAX}")
+        if t == 0 or t%(T_MAX/10) == 0 or t == T_MAX-2:
+            particles_cache.append(pf.particles_t)
+            # print(f"Num of iteration: {t}/{T_MAX}")
 
     # calculate rmse
-    # rmse = calculate_rmse(np.array(pf.estimated_path), path)
+    path_rmse = copy.deepcopy(path)
+    path_rmse = np.delete(path_rmse, idx_not_moved, 0)
+    path_estimated_rmse = copy.deepcopy(pf.estimated_path)
+    # path_estimated_rmse = np.delete(path_estimated_rmse, 0, 0)
+    rmse = calculate_rmse(np.array(path_estimated_rmse), np.array(path_rmse))
+    print(f"PF RMSE: {rmse}")
     collision, collision_count = check_collision_in_path(path, robots, base_joints, obstacles)
     print(f"Collision count: {collision_count}")
 
@@ -274,6 +280,7 @@ def main_pf(path_pf, map_pf):
     # plt.xlim(-4,4)
     # plt.ylim(-2,2)
     # plt.scatter(pf.particles_t0.T[0], pf.particles_t0.T[1], s=5, c='r')
+    print(f"Click the close button to continue")
 
     plt.show()
 
