@@ -19,12 +19,12 @@ NUM_PARTICLES = 300 # number of particles for particle filter
 X_MAX = 8 # max x length for map
 Y_MAX = 4 # max y length for map
 ACTION_ONLY = False
-CHECK_COLLISION = True
-MAP = "pr2maze.json" 
+CHECK_COLLISION = False
+MAP = "minor_obstacle.json" 
 PATH = "minor_obstacle.txt" 
-# MAP = "pr2empty.json"
+# MAP = "open_space.json"
 # PATH = "open_space.txt" 
-# MAP = "pr2complexMaze.json"
+# MAP = "maze.json"
 # PATH = "maze.txt" 
     
 

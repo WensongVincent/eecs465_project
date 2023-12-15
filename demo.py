@@ -12,7 +12,7 @@ import copy
 from tqdm import tqdm
 
 def main(screenshot=False):
-    map_list = ["pr2empty.json", "pr2maze.json" , "pr2complexMaze.json"]
+    map_list = ["open_space.json", "minor_obstacle.json" , "maze.json"]
     path_list = ["open_space.txt", "minor_obstacle.txt", "maze.txt"]
 
     print(f"====================================\nDemo running...\nThere are 3 different maps in demo: open space, minor obstacle, maze\n============================")

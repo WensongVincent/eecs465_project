@@ -133,4 +133,4 @@ def main_kf(path_kf, map_kf):
     
 
 if __name__ == '__main__':
-    main_kf("minor_obstacle.txt", "pr2maze.json")
+    main_kf("minor_obstacle.txt", "minor_obstacle.json")
