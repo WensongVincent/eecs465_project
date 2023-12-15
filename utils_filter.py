@@ -130,3 +130,11 @@ def check_collision_in_path(path, robots, base_joints, obstacles):
             collision = True
             count += 1
     return collision, count
+
+# Function to format list elements
+def format_list(lst, width):
+    return f"{str(lst):<{width}}"
+
+# Function to format single elements
+def format_item(item, width):
+    return f"{item:<{width}}"

@@ -124,12 +124,13 @@ def main_kf(path_kf, map_kf):
     # Adding labels, title, grid, and legend
     plt.xlabel("X Position") 
     plt.ylabel("Y Position") 
-    plt.title("Kalman Filter Path Tracking") 
+    plt.title(f'Kalman Filter Path Tracking for {path_kf.replace("_", " ").replace(".txt", "").title()}') 
     plt.legend() 
     plt.grid(True) 
     plt.show(block=False) 
     disconnect()
+    return rmse, collision_count
     
 
 if __name__ == '__main__':
-    main_kf("path_maze.txt", "pr2maze.json")
+    main_kf("minor_obstacle.txt", "pr2maze.json")

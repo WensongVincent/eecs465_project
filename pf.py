@@ -21,11 +21,11 @@ Y_MAX = 4 # max y length for map
 ACTION_ONLY = False
 CHECK_COLLISION = True
 MAP = "pr2maze.json" 
-PATH = "path_maze.txt" 
+PATH = "minor_obstacle.txt" 
 # MAP = "pr2empty.json"
-# PATH = "path_empty.txt" 
+# PATH = "open_space.txt" 
 # MAP = "pr2complexMaze.json"
-# PATH = "path_complexMaze.txt" 
+# PATH = "maze.txt" 
     
 
 
@@ -262,7 +262,7 @@ def main_pf(path_pf, map_pf):
     plt.xlabel('X Position')
     plt.ylabel('Y Position')
     plt.grid(True)
-    plt.title('Particle Filter Path Tracking')
+    plt.title(f'Particle Filter Path Tracking for {path_pf.replace("_", " ").replace(".txt", "").title()}')
     
     plt.figure(2, figsize=(8, 6))
     plt.xlim(-4,4)
@@ -274,7 +274,7 @@ def main_pf(path_pf, map_pf):
     plt.xlabel('X Position')
     plt.ylabel('Y Position')
     plt.grid(True)
-    plt.title('Particle Filter Particle Examples')
+    plt.title(f'Particle Filter Particle Examples for {path_pf.replace("_", " ").replace(".txt", "").title()}')
 
     # plt.figure(3, figsize=(8, 6))
     # plt.xlim(-4,4)
@@ -283,6 +283,7 @@ def main_pf(path_pf, map_pf):
 
     plt.show(block=False) 
     disconnect()
+    return rmse, collision_count
 
 
 if __name__ == '__main__':

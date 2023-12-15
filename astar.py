@@ -350,8 +350,8 @@ def main(screenshot=False):
     # draw_sphere_marker((0, 0, 1), 0.1, (1, 0, 0, 1))
     
     start_config = tuple(get_joint_positions(robots['pr2'], base_joints))
-    goal_config = (3.4, -1.3, -np.pi/2)
-    # goal_config = (0, 0, 0)
+    # goal_config = (3.4, -1.3, -np.pi/2)
+    goal_config = (3.4, 0, -np.pi/2)
     path = []
     start_time = time.time()
     ### YOUR CODE HERE ###
@@ -361,7 +361,7 @@ def main(screenshot=False):
     # store the path for localization
     path = path.T
     # with open('path_maze.txt', 'w') as file:
-    with open('path_empty.txt', 'w') as file:
+    with open('open_space.txt', 'w') as file:
     # with open('path_complexMaze.txt', 'w') as file:
         for item in path:
             file.write(f'{item}\n')
