@@ -39,7 +39,7 @@ def main(screenshot=False):
             draw(pos,'black', radius=0.07)
         execute_trajectory(robots['pr2'], base_joints, path_gui.T, sleep=0.01)
         print(f"Path shown, please following the guidance:")
-        wait_if_gui()
+        # wait_if_gui()
         disconnect()
 
         # run kf and pf

@@ -19,7 +19,7 @@ NUM_PARTICLES = 300 # number of particles for particle filter
 X_MAX = 8 # max x length for map
 Y_MAX = 4 # max y length for map
 ACTION_ONLY = False
-CHECK_COLLISION = False#True
+CHECK_COLLISION = False
 MAP = "minor_obstacle.json" 
 PATH = "minor_obstacle.txt" 
 # MAP = "open_space.json"
@@ -258,11 +258,11 @@ def main_pf(path_pf, map_pf):
                   0.3 * np.cos(pf.estimated_path[i][2]), 0.3 * np.sin(pf.estimated_path[i][2]), 
                   head_width=0.07, head_length=0.15, fc='red', ec='black')
 
-    plt.legend()
-    plt.xlabel('X Position')
-    plt.ylabel('Y Position')
+    plt.legend(fontsize = 15)
+    plt.xlabel('X Position', fontsize = 15)
+    plt.ylabel('Y Position', fontsize = 15)
     plt.grid(True)
-    plt.title(f'Particle Filter Path Tracking for {path_pf.replace("_", " ").replace(".txt", "").title()}')
+    plt.title(f'Particle Filter Path Tracking for {path_pf.replace("_", " ").replace(".txt", "").title()}', fontsize = 15)
     
     plt.figure(2, figsize=(8, 6))
     plt.xlim(-4,4)
@@ -270,11 +270,11 @@ def main_pf(path_pf, map_pf):
     plt.plot(path.T[0], path.T[1], label='Ground Truth', c='b')
     plt.scatter(np.array(z_cache).T[0], np.array(z_cache).T[1], s=5, label='Sensor Data', c='g')
     plt.scatter(np.array(particles_cache).T[0], np.array(particles_cache).T[1], s=5 ,label='PF Particles example', c='r')
-    plt.legend()
-    plt.xlabel('X Position')
-    plt.ylabel('Y Position')
+    plt.legend(fontsize = 15)
+    plt.xlabel('X Position', fontsize = 15)
+    plt.ylabel('Y Position', fontsize = 15)
     plt.grid(True)
-    plt.title(f'Particle Filter Particle Examples for {path_pf.replace("_", " ").replace(".txt", "").title()}')
+    plt.title(f'Particle Filter Particle Examples for {path_pf.replace("_", " ").replace(".txt", "").title()}', fontsize = 15)
 
     # plt.figure(3, figsize=(8, 6))
     # plt.xlim(-4,4)
@@ -282,6 +282,7 @@ def main_pf(path_pf, map_pf):
     # plt.scatter(pf.particles_t0.T[0], pf.particles_t0.T[1], s=5, c='r')
 
     plt.show(block=False) 
+    # plt.show() 
     disconnect()
     return rmse, collision_count
 

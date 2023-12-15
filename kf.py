@@ -122,10 +122,10 @@ def main_kf(path_kf, map_kf):
     # plt.scatter(kf_states[-1, 0], kf_states[-1, 1], color='r', marker='X', s=100, label="End (EKF)", edgecolor='black')
 
     # Adding labels, title, grid, and legend
-    plt.xlabel("X Position") 
-    plt.ylabel("Y Position") 
-    plt.title(f'Kalman Filter Path Tracking for {path_kf.replace("_", " ").replace(".txt", "").title()}') 
-    plt.legend() 
+    plt.xlabel("X Position", fontsize = 15) 
+    plt.ylabel("Y Position", fontsize = 15) 
+    plt.title(f'Kalman Filter Path Tracking for {path_kf.replace("_", " ").replace(".txt", "").title()}', fontsize = 15) 
+    plt.legend(fontsize = 15) 
     plt.grid(True) 
     plt.show(block=False) 
     disconnect()
