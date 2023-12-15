@@ -30,7 +30,8 @@ def main(screenshot=False):
         print(f"============================\nRunning Demo with Map: {path_name}...\nShowing path...")
         # show path
         connect(use_gui=True)
-        p.resetDebugVisualizerCamera(cameraDistance = 5, cameraYaw = 0, cameraPitch = -60, cameraTargetPosition = [0, 0, 0])
+        # p.resetDebugVisualizerCamera(cameraDistance = 5, cameraYaw = 0, cameraPitch = -60, cameraTargetPosition = [0, 0, 0])
+        p.resetDebugVisualizerCamera(cameraDistance = 5, cameraYaw = 0, cameraPitch = -89.999, cameraTargetPosition = [0, 0, 0])
         robots, obstacles = load_env(map_name)
         base_joints = [joint_from_name(robots['pr2'], name) for name in PR2_GROUPS['base']]
         path_gui = read_path_from_file_no_interpolate(path_name)
@@ -38,7 +39,7 @@ def main(screenshot=False):
             draw(pos,'black', radius=0.07)
         execute_trajectory(robots['pr2'], base_joints, path_gui.T, sleep=0.01)
         print(f"Path shown, please following the guidance:")
-        # wait_if_gui()
+        wait_if_gui()
         disconnect()
 
         # run kf and pf
