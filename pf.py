@@ -281,8 +281,13 @@ def main_pf(path_pf, map_pf):
     # plt.ylim(-2,2)
     # plt.scatter(pf.particles_t0.T[0], pf.particles_t0.T[1], s=5, c='r')
 
-    plt.show(block=False) 
-    # plt.show() 
+    # plt.show(block=False)
+    
+    print("Close plot window(s) to continue... Note: Don't close PyBullet GUI!!!") 
+    plt.show() 
+    # wait_for_user()
+    # plt.close()
+    # plt.close()
     disconnect()
     return rmse, collision_count
 

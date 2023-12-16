@@ -84,7 +84,7 @@ def main_kf(path_kf, map_kf):
 
     # Calculate error
     rmse = calculate_rmse(kf_states, true_state.T)
-    print("KF RMSE: ", rmse)
+    print(f"KF RMSE: {rmse}")
 
     # Check collision
     collision, collision_count = check_collision_in_path(kf_states, robots, base_joints, obstacles)
@@ -127,7 +127,11 @@ def main_kf(path_kf, map_kf):
     plt.title(f'Kalman Filter Path Tracking for {path_kf.replace("_", " ").replace(".txt", "").title()}', fontsize = 16) 
     plt.legend(fontsize = 16) 
     plt.grid(True) 
-    plt.show(block=False) 
+    # plt.show(block=False) 
+    print("Close plot window(s) to continue... Note: Don't close PyBullet GUI!!!") 
+    plt.show()
+    # wait_for_user()
+    # plt.close()
     disconnect()
     return rmse, collision_count
     

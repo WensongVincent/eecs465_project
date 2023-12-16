@@ -50,8 +50,8 @@ def main(screenshot=False):
         rmse_kf.append(rmse)
         collision_count_kf.append(collision_count)
         time_kf.append(end - start)
-        input("Press Enter to continue:")
-        plt.close()
+        # input("Press Enter to continue:")
+        # plt.close()
         
         print(f"========\nRunning Particle Filter...")
         start = time.time()
@@ -60,9 +60,9 @@ def main(screenshot=False):
         rmse_pf.append(rmse)
         collision_count_pf.append(collision_count)
         time_pf.append(end - start)
-        input("Press enter to continue:")
-        plt.close()
-        plt.close()
+        # input("Press enter to continue:")
+        # plt.close()
+        # plt.close()
         
         print(f"Demo with Map: {map_name} Finished!\n============================")
 
@@ -78,7 +78,7 @@ def main(screenshot=False):
     width_col4 = 35
 
     # Header
-    print(f"| {'MAP':<{width_col1}} | {'Open space':<{width_col2}} | {'Minor obstacle':<{width_col3}} | {'Maze':<{width_col4}} |")
+    print(f"| {'MAP':<{width_col1}} | {'Open space':<{width_col2}} | {'Some obstacle':<{width_col3}} | {'Maze':<{width_col4}} |")
     print("|" + "-" * (width_col1 + 2) + "|" + "-" * (width_col2 + 2) + "|" + "-" * (width_col3 + 2) + "|" + "-" * (width_col4 + 2) + "|")
     print(f"| {'RMSE KF':<{width_col1}} | {format_list(rmse_kf[0], width_col2)} | {format_list(rmse_kf[1], width_col3)} | {format_list(rmse_kf[2], width_col4)} |")
     print(f"| {'RMSE PF':<{width_col1}} | {format_list(rmse_pf[0], width_col2)} | {format_list(rmse_pf[1], width_col3)} | {format_list(rmse_pf[2], width_col4)} |")
@@ -89,6 +89,8 @@ def main(screenshot=False):
 
     print(f"\n====================================")
     
+    wait_for_user("All Demo Finished! Result summary shown in table above. Press enter to end demo.")
+    wait_if_gui()
 
 if __name__ == '__main__':
     main()
