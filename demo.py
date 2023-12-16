@@ -80,8 +80,8 @@ def main(screenshot=False):
     # Header
     print(f"| {'MAP':<{width_col1}} | {'Open space':<{width_col2}} | {'Minor obstacle':<{width_col3}} | {'Maze':<{width_col4}} |")
     print("|" + "-" * (width_col1 + 2) + "|" + "-" * (width_col2 + 2) + "|" + "-" * (width_col3 + 2) + "|" + "-" * (width_col4 + 2) + "|")
-    print(f"| {'RMSE_KF':<{width_col1}} | {format_list(rmse_kf[0], width_col2)} | {format_list(rmse_kf[1], width_col3)} | {format_list(rmse_kf[2], width_col4)} |")
-    print(f"| {'RMSE_PF':<{width_col1}} | {format_list(rmse_pf[0], width_col2)} | {format_list(rmse_pf[1], width_col3)} | {format_list(rmse_pf[2], width_col4)} |")
+    print(f"| {'RMSE KF':<{width_col1}} | {format_list(rmse_kf[0], width_col2)} | {format_list(rmse_kf[1], width_col3)} | {format_list(rmse_kf[2], width_col4)} |")
+    print(f"| {'RMSE PF':<{width_col1}} | {format_list(rmse_pf[0], width_col2)} | {format_list(rmse_pf[1], width_col3)} | {format_list(rmse_pf[2], width_col4)} |")
     print(f"| {'Collision Count KF':<{width_col1}} | {format_item(collision_count_kf[0], width_col2)} | {format_item(collision_count_kf[1], width_col3)} | {format_item(collision_count_kf[2], width_col4)} |")
     print(f"| {'Collision Count PF':<{width_col1}} | {format_item(collision_count_pf[0], width_col2)} | {format_item(collision_count_pf[1], width_col3)} | {format_item(collision_count_pf[2], width_col4)} |")
     print(f"| {'Time KF':<{width_col1}} | {format_item(time_kf[0], width_col2)} | {format_item(time_kf[1], width_col3)} | {format_item(time_kf[2], width_col4)} |")
