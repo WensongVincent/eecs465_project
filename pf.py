@@ -19,7 +19,7 @@ NUM_PARTICLES = 300 # number of particles for particle filter
 X_MAX = 8 # max x length for map
 Y_MAX = 4 # max y length for map
 ACTION_ONLY = False
-CHECK_COLLISION = False
+CHECK_COLLISION = True
 MAP = "minor_obstacle.json" 
 PATH = "minor_obstacle.txt" 
 # MAP = "open_space.json"
@@ -242,8 +242,8 @@ def main_pf(path_pf, map_pf):
     plt.xlim(-4,4)
     plt.ylim(-2,2)
     plt.plot(path.T[0], path.T[1], label='Ground Truth', c='b')
-    plt.scatter(np.array(z_cache).T[0], np.array(z_cache).T[1], s=5, label='Sensor Data', c='g')
-    plt.scatter(np.array(pf.estimated_path).T[0], np.array(pf.estimated_path).T[1], s=5 ,label='PF Estimation', c='r')
+    plt.scatter(np.array(z_cache).T[0], np.array(z_cache).T[1], s=10, label='Sensor Data', c='g')
+    plt.scatter(np.array(pf.estimated_path).T[0], np.array(pf.estimated_path).T[1], s=10 ,label='PF Estimation', c='r')
     
     # Add arrows to show orientation at selected points
     arrow_skip = T_MAX//10 # Number of points to skip between arrows
@@ -258,23 +258,23 @@ def main_pf(path_pf, map_pf):
                   0.3 * np.cos(pf.estimated_path[i][2]), 0.3 * np.sin(pf.estimated_path[i][2]), 
                   head_width=0.07, head_length=0.15, fc='red', ec='black')
 
-    plt.legend(fontsize = 15)
-    plt.xlabel('X Position', fontsize = 15)
-    plt.ylabel('Y Position', fontsize = 15)
+    plt.legend(fontsize = 16)
+    plt.xlabel('X Position', fontsize = 16)
+    plt.ylabel('Y Position', fontsize = 16)
     plt.grid(True)
-    plt.title(f'Particle Filter Path Tracking for {path_pf.replace("_", " ").replace(".txt", "").title()}', fontsize = 15)
+    plt.title(f'Particle Filter Path Tracking for {path_pf.replace("_", " ").replace(".txt", "").title()}', fontsize = 16)
     
     plt.figure(2, figsize=(8, 6))
     plt.xlim(-4,4)
     plt.ylim(-2,2)
     plt.plot(path.T[0], path.T[1], label='Ground Truth', c='b')
-    plt.scatter(np.array(z_cache).T[0], np.array(z_cache).T[1], s=5, label='Sensor Data', c='g')
-    plt.scatter(np.array(particles_cache).T[0], np.array(particles_cache).T[1], s=5 ,label='PF Particles example', c='r')
-    plt.legend(fontsize = 15)
-    plt.xlabel('X Position', fontsize = 15)
-    plt.ylabel('Y Position', fontsize = 15)
+    plt.scatter(np.array(z_cache).T[0], np.array(z_cache).T[1], s=10, label='Sensor Data', c='g')
+    plt.scatter(np.array(particles_cache).T[0], np.array(particles_cache).T[1], s=10 ,label='PF Particles example', c='r')
+    plt.legend(fontsize = 16)
+    plt.xlabel('X Position', fontsize = 16)
+    plt.ylabel('Y Position', fontsize = 16)
     plt.grid(True)
-    plt.title(f'Particle Filter Particle Examples for {path_pf.replace("_", " ").replace(".txt", "").title()}', fontsize = 15)
+    plt.title(f'Particle Filter Particle Examples for {path_pf.replace("_", " ").replace(".txt", "").title()}', fontsize = 16)
 
     # plt.figure(3, figsize=(8, 6))
     # plt.xlim(-4,4)

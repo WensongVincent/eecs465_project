@@ -98,9 +98,9 @@ def main_kf(path_kf, map_kf):
 
     # Plotting the actual, measured, and KF paths
     plt.plot(x_true, y_true, 'b-', label="Ground Truth", linewidth=2) 
-    plt.scatter(x_measured, y_measured, color='g', s=5, label="Sensor Data")  
+    plt.scatter(x_measured, y_measured, color='g', s=10, label="Sensor Data")  
     # plt.plot(kf_states[:, 0], kf_states[:, 1], 'r--', label="KF estimation", linewidth=2)  
-    plt.scatter(kf_states[:, 0], kf_states[:, 1], color='r', s=5, label="KF estimation") 
+    plt.scatter(kf_states[:, 0], kf_states[:, 1], color='r', s=10, label="KF estimation") 
 
     # Add arrows to show orientation at selected points
     arrow_skip = 30 # Number of points to skip between arrows
@@ -122,10 +122,10 @@ def main_kf(path_kf, map_kf):
     # plt.scatter(kf_states[-1, 0], kf_states[-1, 1], color='r', marker='X', s=100, label="End (EKF)", edgecolor='black')
 
     # Adding labels, title, grid, and legend
-    plt.xlabel("X Position", fontsize = 15) 
-    plt.ylabel("Y Position", fontsize = 15) 
-    plt.title(f'Kalman Filter Path Tracking for {path_kf.replace("_", " ").replace(".txt", "").title()}', fontsize = 15) 
-    plt.legend(fontsize = 15) 
+    plt.xlabel("X Position", fontsize = 16) 
+    plt.ylabel("Y Position", fontsize = 16) 
+    plt.title(f'Kalman Filter Path Tracking for {path_kf.replace("_", " ").replace(".txt", "").title()}', fontsize = 16) 
+    plt.legend(fontsize = 16) 
     plt.grid(True) 
     plt.show(block=False) 
     disconnect()
